@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(
   cors({
     credentials: true,
-    origin: 'https://finassist-project-1-dqt7.onrender.com',
+    origin: process.env.ORIGIN,
   })
 );
 
