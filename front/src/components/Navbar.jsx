@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useFirebase } from "../config/firebase";
+import { useFirebase } from "../config/Firebase";
 function Navbar() {
   const { signout } = useFirebase();
   return (
