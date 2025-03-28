@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import { useEffect, useState } from "react";
 import { axiosIns2 } from "../config/axios";
+import toast from "react-hot-toast";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -53,6 +54,7 @@ function LineChart() {
       setData(res.data.data);
     } catch (err) {
       console.log(err.response.data.message);
+      toast.error(err.response.data.message);
     }
   };
   const lineData = {
@@ -77,7 +79,7 @@ function LineChart() {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [user]);
 
   return (
     data && (

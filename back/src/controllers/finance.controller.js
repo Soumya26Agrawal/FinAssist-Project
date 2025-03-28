@@ -26,6 +26,12 @@ const post = async (req, res) => {
     if (!newFinance) {
       throw new ApiError("Internal Server Error", 500);
     }
+    if (client.exists("finance")) {
+      client.del("finance");
+    }
+    if (client.exists("groupedSums")) {
+      client.del("groupedSums");
+    }
     return res.status(200).json({ message: "Data saved successfully" });
   } catch (err) {
     if (err instanceof ApiError) {
@@ -110,6 +116,13 @@ const deleteFinance = async (req, res) => {
     if (!deletedFinance) {
       throw new ApiError("Internal Server Error", 500);
     }
+
+    if (client.exists("finance")) {
+      client.del("finance");
+    }
+    if (client.exists("groupedSums")) {
+      client.del("groupedSums");
+    }
     return res
       .status(200)
       .json({ message: "Data deleted successfully", data: deletedFinance });
@@ -192,10 +205,22 @@ const BarYearlyData = async (req, res) => {
     let year = [];
     let expense = [];
     let income = [];
+    const currYear = new Date().getFullYear();
+    for (let i = 0; i < 5; i++) {
+      year.push(currYear - i);
+    }
+    // data.forEach((item) => {
+    //   if (item._id.type === "expense")
+    //     expense[item._id.year - currYear] = item.totalAmount;
+    //   else income[item._id.year - currYear] = item.totalAmount;
+    // });
+
     data.forEach((item) => {
-      if (!year.includes(item._id.year)) year.push(item._id.year);
-      if (item._id.type === "expense") expense.push(item.totalAmount);
-      else income.push(item.totalAmount);
+      const index = year.indexOf(item._id.year);
+      if (index !== -1) {
+        if (item._id.type === "expense") expense[index] = item.totalAmount;
+        else income[index] = item.totalAmount;
+      }
     });
 
     // Assuming you want to send the response back
@@ -233,6 +258,7 @@ const BarMonthlyData = async (req, res) => {
           $group: {
             _id: {
               type: "$type",
+
               month: "$month",
             },
 
@@ -252,12 +278,20 @@ const BarMonthlyData = async (req, res) => {
       await client.expire("barmonthly", 30);
     }
     let month = [];
-    let expense = [];
-    let income = [];
+
+    const currMonth = new Date().getMonth() + 1;
+    for (let i = 0; i < Math.min(5, currMonth); i++) {
+      month.push(currMonth - i);
+    }
+
+    let expense = new Array(month.length).fill(0);
+    let income = new Array(month.length).fill(0);
     data.forEach((item) => {
-      if (!month.includes(item._id.month)) month.push(item._id.month);
-      if (item._id.type === "expense") expense.push(item.totalAmount);
-      else income.push(item.totalAmount);
+      const idx = month.indexOf(item._id.month);
+      if (idx !== -1) {
+        if (item._id.type === "expense") expense[idx] = item.totalAmount;
+        else income[idx] = item.totalAmount;
+      }
     });
 
     const newMonth = [];
@@ -289,6 +323,7 @@ const BarMonthlyData = async (req, res) => {
 const LineCurrMonthData = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id);
     let data;
     const redisData = await client.get("linedaily");
     if (redisData) data = JSON.parse(redisData);
@@ -308,7 +343,7 @@ const LineCurrMonthData = async (req, res) => {
         },
         {
           $match: {
-            year: new Date().getFullYear,
+            year: new Date().getFullYear(),
             month: new Date().getMonth() + 1,
           },
         },
@@ -331,20 +366,93 @@ const LineCurrMonthData = async (req, res) => {
           $limit: 62,
         },
       ]);
+
+      console.log(data);
       await client.set("linedaily", JSON.stringify(data));
       await client.expire("linedaily", 30);
     }
+
     let day = [];
-    let expense = [];
-    let income = [];
+    const date = new Date().getDate();
+    for (let i = 1; i <= date; i++) {
+      day.push(i);
+    }
+    console.log(day);
+    let expense = new Array(day.length).fill(0);
+    let income = new Array(day.length).fill(0);
     data.forEach((item) => {
-      if (!day.includes(item._id.day)) day.push(item._id.day);
-      if (item._id.type === "expense") expense.push(item.totalAmount);
-      else income.push(item.totalAmount);
+      const idx = day.indexOf(item._id.day);
+      if (idx !== -1) {
+        if (item._id.type === "expense") expense[idx] = item.totalAmount;
+        else income[idx] = item.totalAmount;
+      }
+    });
+    console.log(income, expense);
+    // Assuming you want to send the response back
+    res.json({ data: { day, expense, income } });
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+
+const PieChartData = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let data;
+
+    const cache = await client.get("pie");
+    if (cache) data = JSON.parse(cache);
+    else {
+      data = await Finance.aggregate([
+        {
+          $match: {
+            owner: new mongoose.Types.ObjectId(id),
+            type: "expense",
+          },
+        },
+
+        {
+          $group: {
+            _id: "$category",
+
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ]);
+
+      await client.set("pie", JSON.stringify(data));
+      await client.expire("pie", 30);
+    }
+
+    const categories = [
+      "Housing & Rent",
+      "Groceries & Food",
+      "Transportation",
+      "Utilities (electricity, water, phone bills)",
+      "Loans & Debt Payments",
+      "Health & Medical",
+      "Entertainment & Leisure",
+      "Savings & Investments",
+    ];
+    let expense = new Array(categories.length).fill(0);
+
+    // data.forEach((item) => {
+    //   if (item._id.type === "expense")
+    //     expense[item._id.year - currYear] = item.totalAmount;
+    //   else income[item._id.year - currYear] = item.totalAmount;
+    // });
+
+    // let sum = 0;
+    data.forEach((item) => {
+      const index = categories.indexOf(item._id);
+      if (index !== -1) {
+        expense[index] = item.totalAmount;
+        // sum += item.totalAmount;
+      }
     });
 
     // Assuming you want to send the response back
-    res.json({ data: { day, expense, income } });
+    res.json({ data: { categories, expense } });
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -358,4 +466,5 @@ export {
   BarYearlyData,
   BarMonthlyData,
   LineCurrMonthData,
+  PieChartData,
 };

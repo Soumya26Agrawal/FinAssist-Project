@@ -10,3 +10,7 @@ export const client = createClient({
     port: 14535,
   },
 });
+
+client.on("error", (err) => console.log("Redis Client Error", err));
+
+// await client.connect();

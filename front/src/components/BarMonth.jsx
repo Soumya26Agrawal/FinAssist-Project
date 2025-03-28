@@ -80,7 +80,7 @@ function BarChart() {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [user]);
 
   return (
     data && (

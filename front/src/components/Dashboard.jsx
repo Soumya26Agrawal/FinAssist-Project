@@ -10,8 +10,8 @@ function Dashboard() {
   const amount = useRef(null);
   const user = useSelector((state) => state.user.user);
   const [finances, setFinances] = useState([]);
-  const [totalExpense, setTotalExpense] = useState(null);
-  const [totalIncome, setTotalIncome] = useState(null);
+  const [totalExpense, setTotalExpense] = useState(0);
+  const [totalIncome, setTotalIncome] = useState(0);
   const [category, setCategory] = useState(expense);
   // const [editAmountBool, setEditAmountBool] = useState(true);
   const [newAmount, setNewAmount] = useState(null);
@@ -87,25 +87,23 @@ function Dashboard() {
 
   useEffect(() => {
     fetchFinances();
-  });
+  }, []);
   return (
     <div className="flex-1">
       <div className="grid grid-cols-3 text-white text-center gap-2 mt-4">
         <div>
           <h2 className="text-xl mb-2">Earnings</h2>
-          <p className="text-[#FFB400]">{totalIncome && totalIncome}</p>
+          <p className="text-[#FFB400]">{totalIncome}</p>
         </div>
 
         <div>
           <h2 className="text-xl mb-2">Balance</h2>
-          <p className="text-[#FFB400]">
-            {totalIncome && totalExpense && totalExpense + totalIncome}
-          </p>
+          <p className="text-[#FFB400]">{-totalExpense + totalIncome}</p>
         </div>
 
         <div>
           <h2 className="text-xl mb-2">Spendings</h2>
-          <p className="text-[#FFB400]">{totalExpense && totalExpense}</p>
+          <p className="text-[#FFB400]">{totalExpense}</p>
         </div>
       </div>
 
@@ -206,17 +204,17 @@ function Dashboard() {
                   {f.type}
                 </td>
                 <td className="py-3 px-6 border-b">
-                  <button
-                    // onClick={() => {
-                    //   alert("Click on amount value to edit");
-                    //   setEditAmountBool(false);
-                    //   amount.current.focus();
-                    // }}
-                    // onClick={() => handleShow(f._id)}
+                  {/* <button
+                    onClick={() => {
+                      alert("Click on amount value to edit");
+                      setEditAmountBool(false);
+                      amount.current.focus();
+                    }}
+                    onClick={() => handleShow(f._id)}
                     className="bg-[#0D1B2A]  px-3 py-1 rounded hover:bg-white hover:text-black "
                   >
                     Edit
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => handleDelTransaction(f._id)}
                     className="bg-[#0D1B2A]  px-3 py-1 rounded hover:bg-white hover:text-black "
