@@ -5,7 +5,7 @@ import PieChart from "./PieChart";
 
 function Visuals() {
   return (
-    <div className="grid grid-cols-2 grid-rows-2 gap-10 min-h-screen w-full text-center">
+    <div className="grid grid-cols-2 grid-rows-2 gap-2 min-h-screen w-full text-center">
       <div className="h-full w-[90%]">
         <PieChart />
       </div>
