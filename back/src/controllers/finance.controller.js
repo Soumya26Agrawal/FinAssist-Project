@@ -374,7 +374,7 @@ const LineCurrMonthData = async (req, res) => {
 
     let day = [];
     const date = new Date().getDate();
-    for (let i = 1; i <= date; i++) {
+    for (let i = date-10; i <= date; i++) {
       day.push(i);
     }
     console.log(day);
