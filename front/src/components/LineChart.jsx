@@ -65,14 +65,14 @@ function LineChart() {
         data: data?.income,
         borderWidth: 1,
         backgroundColor: "white",
-        borderColor: "rgb(217,1,102)",
+        borderColor: "white",
       },
       {
         label: "Day wise expense",
         data: data?.expense,
         borderWidth: 1,
         backgroundColor: "pink",
-        borderColor: "white",
+        borderColor: "pink",
       },
     ],
   };
