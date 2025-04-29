@@ -66,18 +66,16 @@ git clone https://github.com/yourusername/finassist.git
 # Navigate to the project directory
 cd finassist
 
-# Install backend dependencies
-npm install
+# Backend Setup (/back folder)
+cd back
+npm install         
+npm run dev         
 
-# Start backend server
-npm run dev
+#  Frontend Setup (/front folder)
+cd front
+npm install         
+npm start 
 
-# In a new terminal: install frontend dependencies
-cd client
-npm install
-
-# Start frontend
-npm start
 
 
 
