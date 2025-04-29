@@ -79,8 +79,5 @@ npm start
 
 
 
-# Start frontend
-npm start
-
 
 
