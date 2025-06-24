@@ -6,8 +6,10 @@ export const client = createClient({
   username: "default",
   password: process.env.REDISPASSWORD,
   socket: {
-    host: "redis-14535.c305.ap-south-1-1.ec2.redns.redis-cloud.com",
-    port: 14535,
+    // host: "redis-14535.c305.ap-south-1-1.ec2.redns.redis-cloud.com",
+    // port: 14535,
+     host: 'redis-19391.crce179.ap-south-1-1.ec2.redns.redis-cloud.com',
+     port: 19391
   },
 });
 
