@@ -50,7 +50,7 @@ const getAll = async (req, res) => {
     let userFinances;
     let groupedSums;
 
-    const data = await client.get("finance");
+    const data = await client.get(`finance${user._id}`);
     if (data) userFinances = JSON.parse(data);
     else {
       userFinances = await Finance.aggregate([
@@ -61,12 +61,12 @@ const getAll = async (req, res) => {
           },
         },
       ]);
-      await client.set("finance", JSON.stringify(userFinances));
-      await client.expire("finance", 30);
+      await client.set(`finance${user._id}`, JSON.stringify(userFinances));
+      await client.expire(`finance${user._id}`, 30);
     }
     // console.log(userFinances);
 
-    const redisData = await client.get("groupedSums");
+    const redisData = await client.get(`groupedSums${user._id}`);
     if (redisData) groupedSums = JSON.parse(redisData);
     else {
       groupedSums = await Finance.aggregate([
@@ -84,8 +84,8 @@ const getAll = async (req, res) => {
           },
         },
       ]);
-      await client.set("groupedSums", JSON.stringify(groupedSums));
-      await client.expire("groupedSums", 30);
+      await client.set(`groupedSums${user._id}`, JSON.stringify(groupedSums));
+      await client.expire(`groupedSums${user._id}`, 30);
     }
     const expenseData = groupedSums.find((item) => item._id === "expense") || {
       totalAmount: 0,
