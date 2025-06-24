@@ -26,11 +26,11 @@ const post = async (req, res) => {
     if (!newFinance) {
       throw new ApiError("Internal Server Error", 500);
     }
-    if (client.exists("finance")) {
-      client.del("finance");
+    if (client.exists(`finance${user}`)) {
+      client.del(`finance${user}`);
     }
-    if (client.exists("groupedSums")) {
-      client.del("groupedSums");
+    if (client.exists(`groupedSums${user}`)) {
+      client.del(`groupedSums${user}`);
     }
     return res.status(200).json({ message: "Data saved successfully" });
   } catch (err) {
@@ -50,7 +50,7 @@ const getAll = async (req, res) => {
     let userFinances;
     let groupedSums;
 
-    const data = await client.get(`finance${user._id}`);
+    const data = await client.get(`finance${user}`);
     if (data) userFinances = JSON.parse(data);
     else {
       userFinances = await Finance.aggregate([
@@ -61,12 +61,12 @@ const getAll = async (req, res) => {
           },
         },
       ]);
-      await client.set(`finance${user._id}`, JSON.stringify(userFinances));
-      await client.expire(`finance${user._id}`, 30);
+      await client.set(`finance${user}`, JSON.stringify(userFinances));
+      await client.expire(`finance${user}`, 30);
     }
     // console.log(userFinances);
 
-    const redisData = await client.get(`groupedSums${user._id}`);
+    const redisData = await client.get(`groupedSums${user}`);
     if (redisData) groupedSums = JSON.parse(redisData);
     else {
       groupedSums = await Finance.aggregate([
@@ -84,8 +84,8 @@ const getAll = async (req, res) => {
           },
         },
       ]);
-      await client.set(`groupedSums${user._id}`, JSON.stringify(groupedSums));
-      await client.expire(`groupedSums${user._id}`, 30);
+      await client.set(`groupedSums${user}`, JSON.stringify(groupedSums));
+      await client.expire(`groupedSums${user}`, 30);
     }
     const expenseData = groupedSums.find((item) => item._id === "expense") || {
       totalAmount: 0,
@@ -117,11 +117,11 @@ const deleteFinance = async (req, res) => {
       throw new ApiError("Internal Server Error", 500);
     }
 
-    if (client.exists("finance")) {
-      client.del("finance");
+    if (client.exists(`finance${id}`)) {
+      client.del(`finance${id}`);
     }
-    if (client.exists("groupedSums")) {
-      client.del("groupedSums");
+    if (client.exists(`groupedSums${id}`)) {
+      client.del(`groupedSums${id}`);
     }
     return res
       .status(200)
@@ -162,7 +162,7 @@ const BarYearlyData = async (req, res) => {
     const { id } = req.params;
     let data;
 
-    const cache = await client.get("baryearly");
+    const cache = await client.get(`baryearly${id}`);
     if (cache) data = JSON.parse(cache);
     else {
       data = await Finance.aggregate([
@@ -198,8 +198,8 @@ const BarYearlyData = async (req, res) => {
         },
       ]);
 
-      await client.set("baryearly", JSON.stringify(data));
-      await client.expire("baryearly", 30);
+      await client.set(`baryearly${id}`, JSON.stringify(data));
+      await client.expire(`baryearly${id}`, 30);
     }
 
     let year = [];
@@ -233,7 +233,7 @@ const BarMonthlyData = async (req, res) => {
   try {
     const { id } = req.params;
     let data;
-    const redisData = await client.get("barmonthly");
+    const redisData = await client.get(`barmonthly${id}`);
     if (redisData) data = JSON.parse(redisData);
     else {
       data = await Finance.aggregate([
@@ -274,8 +274,8 @@ const BarMonthlyData = async (req, res) => {
           $limit: 10,
         },
       ]);
-      await client.set("barmonthly", JSON.stringify(data));
-      await client.expire("barmonthly", 30);
+      await client.set(`barmonthly${id}`, JSON.stringify(data));
+      await client.expire(`barmonthly${id}`, 30);
     }
     let month = [];
 
@@ -325,7 +325,7 @@ const LineCurrMonthData = async (req, res) => {
     const { id } = req.params;
     console.log(id);
     let data;
-    const redisData = await client.get("linedaily");
+    const redisData = await client.get(`linedaily${id}`);
     if (redisData) data = JSON.parse(redisData);
     else {
       data = await Finance.aggregate([
@@ -368,8 +368,8 @@ const LineCurrMonthData = async (req, res) => {
       ]);
 
       console.log(data);
-      await client.set("linedaily", JSON.stringify(data));
-      await client.expire("linedaily", 30);
+      await client.set(`linedaily${id}`, JSON.stringify(data));
+      await client.expire(`linedaily${id}`, 30);
     }
 
     let day = [];
@@ -400,7 +400,7 @@ const PieChartData = async (req, res) => {
     const { id } = req.params;
     let data;
 
-    const cache = await client.get("pie");
+    const cache = await client.get(`pie${id}`);
     if (cache) data = JSON.parse(cache);
     else {
       data = await Finance.aggregate([
@@ -420,8 +420,8 @@ const PieChartData = async (req, res) => {
         },
       ]);
 
-      await client.set("pie", JSON.stringify(data));
-      await client.expire("pie", 30);
+      await client.set(`pie${id}`, JSON.stringify(data));
+      await client.expire(`pie${id}`, 30);
     }
 
     const categories = [
