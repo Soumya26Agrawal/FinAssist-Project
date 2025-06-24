@@ -8,11 +8,13 @@ export const client = createClient({
   socket: {
     // host: "redis-14535.c305.ap-south-1-1.ec2.redns.redis-cloud.com",
     // port: 14535,
-     host: 'redis-19391.crce179.ap-south-1-1.ec2.redns.redis-cloud.com',
-     port: 19391
+      host: 'redis-16204.c305.ap-south-1-1.ec2.redns.redis-cloud.com',
+      port: 16204
   },
 });
 
-client.on("error", (err) => console.log("Redis Client Error", err));
+
+
+
 
 // await client.connect();
