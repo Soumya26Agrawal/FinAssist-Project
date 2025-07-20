@@ -111,17 +111,17 @@ const getAll = async (req, res) => {
 
 const deleteFinance = async (req, res) => {
   try {
-    const id = req.params.id;
+    const {id,userid} = req.params;
     const deletedFinance = await Finance.findByIdAndDelete(id);
     if (!deletedFinance) {
       throw new ApiError("Internal Server Error", 500);
     }
 
-    if (client.exists(`finance${id}`)) {
-      client.del(`finance${id}`);
+    if (client.exists(`finance${userid}`)) {
+      client.del(`finance${userid}`);
     }
-    if (client.exists(`groupedSums${id}`)) {
-      client.del(`groupedSums${id}`);
+    if (client.exists(`groupedSums${userid}`)) {
+      client.del(`groupedSums${userid}`);
     }
     return res
       .status(200)
