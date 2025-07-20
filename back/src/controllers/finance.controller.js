@@ -251,7 +251,7 @@ const BarMonthlyData = async (req, res) => {
         },
         {
           $match: {
-            year: new Date().getFullYear,
+            year: new Date().getFullYear(),
           },
         },
         {
