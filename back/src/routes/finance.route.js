@@ -14,7 +14,7 @@ import {
 
 router.route("/post").post(post);
 router.route("/get").get(getAll);
-router.route("/delete/:id").delete(deleteFinance);
+router.route("/delete/:id/:userid").delete(deleteFinance);
 router.route("/edit/:id").patch(editFinance);
 router.route("/graph1/:id").get(BarYearlyData);
 router.route("/graph2/:id").get(BarMonthlyData);
