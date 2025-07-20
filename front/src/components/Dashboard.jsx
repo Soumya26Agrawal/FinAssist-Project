@@ -50,7 +50,7 @@ function Dashboard() {
 
   async function handleDelTransaction(id) {
     try {
-      const res = await axiosIns2.delete(`/delete/${id}`);
+      const res = await axiosIns2.delete(`/delete/${id}/${user._id}`);
       toast.success(res.data.message);
       await fetchFinances();
     } catch (err) {
