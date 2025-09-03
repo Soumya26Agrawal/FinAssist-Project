@@ -76,7 +76,7 @@ npm install
 npm start 
 
 
-
+Note - The project is in progress to make it responsive and include some features like cron for scheduled tasks.
 
 
 
